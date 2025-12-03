@@ -6,7 +6,7 @@ on:
       - master
   pull_request:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: "0 5 * * *"
 
 jobs:
   industrial_ci:
@@ -18,7 +18,7 @@ jobs:
       OS_CODE_NAME: focal
       ROS_DISTRO: noetic
       ROS_REPO: main
-      UPSTREAM_WORKSPACE: 'dependencies.rosinstall'
+      UPSTREAM_WORKSPACE: "dependencies.rosinstall"
       ROSDEP_SKIP_KEYS: "bullet bullet-extras fcl ompl orocos_kdl python-numpy ifopt python descartes_opw descartes_samplers descartes_light opw_kinematics ros_industrial_cmake_boilerplate iwyu taskflow"
       DOCKER_IMAGE: "rosindustrial/tesseract:noetic"
       CCACHE_DIR: "/home/runner/work/tesseract_python/tesseract_python/Focal-Build/.ccache"
@@ -47,12 +47,12 @@ jobs:
           message("::set-output name=timestamp::${current_date}")
 
       - name: ccache cache files
-        uses: actions/cache@v1.1.0
+        uses: actions/cache@v3
         with:
           path: ${{ env.CI_NAME }}/.ccache
           key: ${{ env.CI_NAME }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
           restore-keys: |
             ${{ env.CI_NAME }}-ccache-
 
-      - uses: 'ros-industrial/industrial_ci@master'
+      - uses: "ros-industrial/industrial_ci@master"
         env: ${{env}}

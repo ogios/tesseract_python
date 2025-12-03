@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [labeled]
   schedule:
-    - cron: '0 5 * * *'
+    - cron: "0 5 * * *"
 
 jobs:
   industrial_ci:
@@ -15,31 +15,35 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - {CI_NAME: Bionic-Build-Nightly,
-             OS_NAME: ubuntu,
-             OS_CODE_NAME: bionic,
-             ROS_DISTRO: melodic,
-             ROS_REPO: main,
-             UPSTREAM_WORKSPACE: 'dependencies.rosinstall',
-             ROSDEP_SKIP_KEYS: "bullet bullet-extras ros_industrial_cmake_boilerplate fcl iwyu",
-             DOCKER_IMAGE: "rosindustrial/tesseract:melodic",
-             CCACHE_DIR: "/home/runner/work/tesseract_python/tesseract_python/Bionic-Build-Nightly/.ccache",
-             PARALLEL_TESTS: false,
-             UPSTREAM_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release",
-             TARGET_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release",
-             DOWNSTREAM_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release"}
-          - {CI_NAME: Focal-Build-Nightly,
-             OS_NAME: ubuntu,
-             OS_CODE_NAME: focal,
-             ROS_DISTRO: noetic,
-             ROS_REPO: main,
-             UPSTREAM_WORKSPACE: 'dependencies.rosinstall',
-             ROSDEP_SKIP_KEYS: "bullet bullet-extras ros_industrial_cmake_boilerplat fcl iwyu benchmark",
-             DOCKER_IMAGE: "rosindustrial/tesseract:noetic",
-             CCACHE_DIR: "/home/runner/work/tesseract_python/tesseract_python/Focal-Build-Nightly/.ccache",
-             UPSTREAM_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release",
-             TARGET_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release",
-             DOWNSTREAM_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release"}
+          - {
+              CI_NAME: Bionic-Build-Nightly,
+              OS_NAME: ubuntu,
+              OS_CODE_NAME: bionic,
+              ROS_DISTRO: melodic,
+              ROS_REPO: main,
+              UPSTREAM_WORKSPACE: "dependencies.rosinstall",
+              ROSDEP_SKIP_KEYS: "bullet bullet-extras ros_industrial_cmake_boilerplate fcl iwyu",
+              DOCKER_IMAGE: "rosindustrial/tesseract:melodic",
+              CCACHE_DIR: "/home/runner/work/tesseract_python/tesseract_python/Bionic-Build-Nightly/.ccache",
+              PARALLEL_TESTS: false,
+              UPSTREAM_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release",
+              TARGET_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release",
+              DOWNSTREAM_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release",
+            }
+          - {
+              CI_NAME: Focal-Build-Nightly,
+              OS_NAME: ubuntu,
+              OS_CODE_NAME: focal,
+              ROS_DISTRO: noetic,
+              ROS_REPO: main,
+              UPSTREAM_WORKSPACE: "dependencies.rosinstall",
+              ROSDEP_SKIP_KEYS: "bullet bullet-extras ros_industrial_cmake_boilerplat fcl iwyu benchmark",
+              DOCKER_IMAGE: "rosindustrial/tesseract:noetic",
+              CCACHE_DIR: "/home/runner/work/tesseract_python/tesseract_python/Focal-Build-Nightly/.ccache",
+              UPSTREAM_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release",
+              TARGET_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release",
+              DOWNSTREAM_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Release",
+            }
 
     steps:
       - uses: actions/checkout@v1
@@ -60,12 +64,12 @@ jobs:
           message("::set-output name=timestamp::${current_date}")
 
       - name: ccache cache files
-        uses: actions/cache@v1.1.0
+        uses: actions/cache@v3
         with:
           path: ${{ matrix.env.CI_NAME }}/.ccache
           key: ${{ matrix.env.CI_NAME }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
           restore-keys: |
             ${{ matrix.env.CI_NAME }}-ccache-
 
-      - uses: 'ros-industrial/industrial_ci@master'
+      - uses: "ros-industrial/industrial_ci@master"
         env: ${{matrix.env}}
