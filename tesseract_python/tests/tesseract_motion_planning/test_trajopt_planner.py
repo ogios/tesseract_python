@@ -5,6 +5,7 @@ import numpy as np
 import numpy.testing as nptest
 
 from tesseract_robotics.tesseract_common import ResourceLocator, SimpleLocatedResource, ProfileDictionary
+from tesseract_robotics.tesseract_collision import CollisionEvaluatorType_LVS_DISCRETE
 from tesseract_robotics.tesseract_environment import Environment
 from tesseract_robotics.tesseract_common import FilesystemPath, Isometry3d, Translation3d, Quaterniond, \
     ManipulatorInfo, GeneralResourceLocator
@@ -17,10 +18,39 @@ from tesseract_robotics.tesseract_command_language import  JointWaypoint, Cartes
     WaypointPoly_wrap_JointWaypoint, WaypointPoly_wrap_CartesianWaypoint
 from tesseract_robotics.tesseract_motion_planners import PlannerRequest, PlannerResponse
 from tesseract_robotics.tesseract_motion_planners_trajopt import TrajOptDefaultMoveProfile, TrajOptDefaultCompositeProfile, \
-    TrajOptMotionPlanner
+    TrajOptMotionPlanner, CollisionCoeffData, TrajOptCollisionConfig, TrajOptOSQPSolverProfile
 from tesseract_robotics.tesseract_motion_planners_simple import generateInterpolatedProgram
 
 TRAJOPT_DEFAULT_NAMESPACE = "TrajOptMotionPlannerTask"
+
+
+def test_trajopt_collision_config():
+    collision_coeff_data = CollisionCoeffData()
+    collision_coeff_data.setDefaultCollisionCoeff(10.0)
+    assert collision_coeff_data.getDefaultCollisionCoeff() == 10.0
+
+    collision_config = TrajOptCollisionConfig()
+    collision_config.enabled = False
+    collision_config.collision_coeff_data.setDefaultCollisionCoeff(10.0)
+    collision_config.collision_check_config.type = CollisionEvaluatorType_LVS_DISCRETE
+
+    assert not collision_config.enabled
+    assert collision_config.collision_coeff_data.getDefaultCollisionCoeff() == 10.0
+    assert collision_config.collision_check_config.type == CollisionEvaluatorType_LVS_DISCRETE
+
+    profile = TrajOptDefaultCompositeProfile()
+    profile.collision_cost_config.enabled = False
+    profile.collision_constraint_config.collision_coeff_data.setDefaultCollisionCoeff(10.0)
+
+    assert not profile.collision_cost_config.enabled
+    assert profile.collision_constraint_config.collision_coeff_data.getDefaultCollisionCoeff() == 10.0
+
+
+def test_trajopt_osqp_solver_profile():
+    solver = TrajOptOSQPSolverProfile()
+    solver.opt_params.trust_box_size = 0.02
+    assert solver.opt_params.trust_box_size == 0.02
+
 
 def get_environment():
     locator = GeneralResourceLocator()

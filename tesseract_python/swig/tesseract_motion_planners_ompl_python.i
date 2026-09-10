@@ -36,6 +36,7 @@
 %{
 // tesseract_motion_planners_ompl
 #include <tesseract/motion_planners/ompl/ompl_planner_configurator.h>
+#include <tesseract/motion_planners/ompl/ompl_solver_config.h>
 #include <tesseract/motion_planners/ompl/profile/ompl_profile.h>
 #include <tesseract/motion_planners/ompl/profile/ompl_real_vector_move_profile.h>
 #include <tesseract/motion_planners/ompl/ompl_motion_planner.h>
@@ -104,6 +105,19 @@
 %ignore create(ompl::base::SpaceInformationPtr si) const;
 %include "tesseract/motion_planners/ompl/ompl_planner_configurator.h"
 %template(OMPLPlanners) std::vector<tesseract::motion_planners::OMPLPlannerConfigurator::ConstPtr>;
+%include "tesseract/motion_planners/ompl/ompl_solver_config.h"
+%extend tesseract::motion_planners::OMPLSolverConfig
+{
+  void clearPlanners()
+  {
+    $self->planners.clear();
+  }
+
+  void addPlanner(const tesseract::motion_planners::OMPLPlannerConfigurator::ConstPtr& planner)
+  {
+    $self->planners.push_back(planner);
+  }
+}
 %shared_factory(
   tesseract::motion_planners::OMPLPlannerConfigurator,
   tesseract::motion_planners::SBLConfigurator,

@@ -36,6 +36,7 @@
 %{
 // trajopt
 #include <trajopt/problem_description.hpp>
+#include <trajopt_common/collision_types.h>
 
 // tesseract_motion_planners_trajopt
 #include <tesseract/motion_planners/trajopt/trajopt_motion_planner.h>
@@ -44,6 +45,7 @@
 #include <tesseract/motion_planners/trajopt/profile/trajopt_profile.h>
 #include <tesseract/motion_planners/trajopt/profile/trajopt_default_composite_profile.h>
 #include <tesseract/motion_planners/trajopt/profile/trajopt_default_move_profile.h>
+#include <tesseract/motion_planners/trajopt/profile/trajopt_osqp_solver_profile.h>
 
 
 #include <tesseract/geometry/geometries.h>
@@ -101,6 +103,9 @@
 
 %include "tesseract/motion_planners/trajopt/trajopt_waypoint_config.h"
 
+// The complete header contains function types that are too noisy for SWIG.
+%include "trajopt/collision_types.i"
+
 %pythondynamic tesseract::motion_planners::TrajOptMoveProfile;
 %pythondynamic tesseract::motion_planners::TrajOptCompositeProfile;
 %pythondynamic tesseract::motion_planners::TrajOptSolverProfile;
@@ -114,6 +119,11 @@
 %tesseract_command_language_add_profile_type(TrajOptSolverProfile);
 %tesseract_command_language_add_profile_type(TrajOptMoveProfile);
 %tesseract_command_language_add_profile_type(TrajOptCompositeProfile);
+
+%pythondynamic tesseract::motion_planners::TrajOptOSQPSolverProfile;
+%shared_ptr(tesseract::motion_planners::TrajOptOSQPSolverProfile)
+%include "tesseract/motion_planners/trajopt/profile/trajopt_osqp_solver_profile.h"
+%tesseract_command_language_add_profile_type(TrajOptOSQPSolverProfile);
 
 %pythondynamic tesseract::motion_planners::TrajOptDefaultMoveProfile;
 %shared_ptr(tesseract::motion_planners::TrajOptDefaultMoveProfile)
@@ -133,4 +143,3 @@
 // TODO
 // %template(TrajOptIfoptCompositeProfileMap) std::unordered_map<std::string, std::shared_ptr<const tesseract::motion_planners::TrajOptIfoptCompositeProfile>>;
 // %template(TrajOptIfoptMoveProfileMap) std::unordered_map<std::string, std::shared_ptr<const tesseract::motion_planners::TrajOptIfoptMoveProfile>>;
-

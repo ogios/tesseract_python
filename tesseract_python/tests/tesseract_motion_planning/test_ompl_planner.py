@@ -22,6 +22,17 @@ from tesseract_robotics.tesseract_motion_planners_simple import generateInterpol
 
 OMPL_DEFAULT_NAMESPACE = "OMPLMotionPlannerTask"
 
+
+def test_ompl_solver_config_planners():
+    profile = OMPLRealVectorMoveProfile()
+
+    profile.solver_config.clearPlanners()
+    assert len(profile.solver_config.planners) == 0
+
+    profile.solver_config.addPlanner(RRTConnectConfigurator())
+    assert len(profile.solver_config.planners) == 1
+
+
 def get_environment():
     locator = GeneralResourceLocator()
     env = Environment()
@@ -89,4 +100,3 @@ def test_ompl_freespace_joint_cart():
         assert len(wp.getNames()) == 7
         assert isinstance(wp.getPosition(),np.ndarray)
         assert len(wp.getPosition()) == 7
-
