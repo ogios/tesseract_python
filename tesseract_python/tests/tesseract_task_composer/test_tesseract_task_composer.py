@@ -63,6 +63,7 @@ def test_task_composer_node_info_container_python_helpers():
     all_infos = task_infos.getAllInfos()
     assert len(all_infos) == 1
     assert all_infos[0].name == "FailingTask"
+    assert [info.name for info in all_infos] == ["FailingTask"]
 
 
 def get_environment():

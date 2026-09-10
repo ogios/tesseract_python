@@ -177,9 +177,10 @@
 %include "tesseract/task_composer/task_composer_node_info.h"
 
 // Expose node info without leaking the container's UUID-keyed implementation map.
-// Returning values also keeps the Python objects valid if the container is later
-// modified or destroyed.
-%template(TaskComposerNodeInfoVector) std::vector<tesseract::task_composer::TaskComposerNodeInfo>;
+// Hold elements by shared_ptr (not by value): TaskComposerNodeInfo is registered
+// via %shared_ptr, so the value-type vector iterator would wrap raw pointers that
+// have no registered type/destructor, yielding opaque proxies without attributes.
+%template(TaskComposerNodeInfoVector) std::vector<std::shared_ptr<tesseract::task_composer::TaskComposerNodeInfo>>;
 %newobject tesseract::task_composer::TaskComposerNodeInfoContainer::getAbortingNodeInfo;
 %extend tesseract::task_composer::TaskComposerNodeInfoContainer
 {
@@ -196,13 +197,13 @@
     return new tesseract::task_composer::TaskComposerNodeInfo(std::move(info.value()));
   }
 
-  std::vector<tesseract::task_composer::TaskComposerNodeInfo> getAllInfos() const
+  std::vector<std::shared_ptr<tesseract::task_composer::TaskComposerNodeInfo>> getAllInfos() const
   {
     const auto info_map = $self->getInfoMap();
-    std::vector<tesseract::task_composer::TaskComposerNodeInfo> infos;
+    std::vector<std::shared_ptr<tesseract::task_composer::TaskComposerNodeInfo>> infos;
     infos.reserve(info_map.size());
     for (const auto& item : info_map)
-      infos.push_back(item.second);
+      infos.push_back(std::make_shared<tesseract::task_composer::TaskComposerNodeInfo>(item.second));
     return infos;
   }
 }
