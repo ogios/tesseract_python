@@ -28,13 +28,42 @@ from tesseract_robotics import tesseract_common
 #     TrajOptProblemGeneratorFn, TrajOptMotionPlanner, ProfileDictionary_addProfile_TrajOptMoveProfile, \
 #     ProfileDictionary_addProfile_TrajOptCompositeProfile
 from tesseract_robotics.tesseract_task_composer import TaskComposerPluginFactory, \
-    TaskComposerDataStorage, TaskComposerContext, TaskComposerDataStorageUPtr, TaskComposerLog
+    TaskComposerDataStorage, TaskComposerContext, TaskComposerDataStorageUPtr, TaskComposerLog, \
+    TaskComposerNodeInfo, TaskComposerNodeInfoContainer
 
 
 OMPL_DEFAULT_NAMESPACE = "OMPLMotionPlannerTask"
 TRAJOPT_DEFAULT_NAMESPACE = "TrajOptMotionPlannerTask"
 
 tesseract_common.setLogLevel(tesseract_common.CONSOLE_BRIDGE_LOG_DEBUG)
+
+
+def test_task_composer_node_info_container_python_helpers():
+    task_infos = TaskComposerNodeInfoContainer()
+
+    assert task_infos.getAbortingNodeInfo() is None
+    assert len(task_infos.getAllInfos()) == 0
+
+    info = TaskComposerNodeInfo()
+    info.uuid = tesseract_common.newRandomUuid()
+    info.name = "FailingTask"
+    info.return_value = 0
+    info.status_code = 42
+    info.status_message = "planning failed"
+    task_infos.addInfo(info)
+    task_infos.setAborted(info.uuid)
+
+    aborting_info = task_infos.getAbortingNodeInfo()
+    assert aborting_info is not None
+    assert aborting_info.name == "FailingTask"
+    assert aborting_info.return_value == 0
+    assert aborting_info.status_code == 42
+    assert aborting_info.status_message == "planning failed"
+
+    all_infos = task_infos.getAllInfos()
+    assert len(all_infos) == 1
+    assert all_infos[0].name == "FailingTask"
+
 
 def get_environment():
     env = Environment()

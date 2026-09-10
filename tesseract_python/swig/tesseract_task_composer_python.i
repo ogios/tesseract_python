@@ -176,6 +176,37 @@
 %ignore tesseract::task_composer::TaskComposerNodeInfoContainer::find;
 %include "tesseract/task_composer/task_composer_node_info.h"
 
+// Expose node info without leaking the container's UUID-keyed implementation map.
+// Returning values also keeps the Python objects valid if the container is later
+// modified or destroyed.
+%template(TaskComposerNodeInfoVector) std::vector<tesseract::task_composer::TaskComposerNodeInfo>;
+%newobject tesseract::task_composer::TaskComposerNodeInfoContainer::getAbortingNodeInfo;
+%extend tesseract::task_composer::TaskComposerNodeInfoContainer
+{
+  tesseract::task_composer::TaskComposerNodeInfo* getAbortingNodeInfo() const
+  {
+    const auto aborting_node = $self->getAbortingNode();
+    if (aborting_node.is_nil())
+      return nullptr;
+
+    auto info = $self->getInfo(aborting_node);
+    if (!info.has_value())
+      return nullptr;
+
+    return new tesseract::task_composer::TaskComposerNodeInfo(std::move(info.value()));
+  }
+
+  std::vector<tesseract::task_composer::TaskComposerNodeInfo> getAllInfos() const
+  {
+    const auto info_map = $self->getInfoMap();
+    std::vector<tesseract::task_composer::TaskComposerNodeInfo> infos;
+    infos.reserve(info_map.size());
+    for (const auto& item : info_map)
+      infos.push_back(item.second);
+    return infos;
+  }
+}
+
 // task_composer_data_storage
 
 %s_u_ptr(TaskComposerDataStorage)
